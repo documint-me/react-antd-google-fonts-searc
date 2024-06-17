@@ -29,12 +29,12 @@ export const checkCategory = (font: FontType, category: string, subset: string) 
     return true
   }
   if (category === 'all' && subset !== 'all') {
-    return font.subsets.indexOf(category) > -1
+    return font.subsets.indexOf(subset) > -1
   }
   if (category !== 'all' && subset === 'all') {
     return font.category === category
   }
-  return font.category === category && font.subsets.indexOf(category) > -1
+  return font.category === category && font.subsets.indexOf(subset) > -1
 }
 
 export const filterFonts = (
