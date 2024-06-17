@@ -76,7 +76,6 @@
     "access": "public"
   },
   "dependencies": {
-    "react-infinite-scroll-component": "^6.1.0",
     "webfontloader": "^1.6.28"
   }
 }

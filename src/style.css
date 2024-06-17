@@ -1,4 +1,62 @@
 .flex-end {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.preview {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.preview div {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  height: 100%;
+  -webkit-animation-name: fadeIn;
+  -webkit-animation-timing-function: ease-in;
+  -webkit-animation-duration: 1s;
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 1s;
+  transform: translatez(0);
+}
+
+.preview:hover span {
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+    -webkit-transition: -webkit-transform 10s linear;
+    transition: transform 10s linear;
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

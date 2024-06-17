@@ -1,4 +1,4 @@
-const paragraphs = [
+export const paragraphs = [
   'Alegreya',
   'Asap',
   'Average',
@@ -30,7 +30,7 @@ const paragraphs = [
   'Vollkorn',
   'Work Sans',
 ]
-const headings = [
+export const headings = [
   'Abel',
   'Arvo',
   'Bitter',
@@ -62,12 +62,26 @@ const headings = [
   'Vollkorn',
   'Work Sans',
 ]
-const texts = [
+export const texts = [
   'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789',
-  'Font Name',
+  'fontName',
   'Grumpy wizards make toxic brew for the evil Queen and Jack.',
   'Bright vixens jump dozy fowl quack',
   'Waltz bad nymph for quick jugs vex',
   'Brick quiz whangs jumpy veldt fox',
   'The quick brown fox jumps over the lazy dog.',
 ]
+export const groupSize = 900
+
+export const weightLabels = {
+  100: 'Thin',
+  200: 'Extra-Light',
+  300: 'Light',
+  400: 'Normal',
+  500: 'Medium',
+  600: 'Semi-Bold',
+  700: 'Bold',
+  800: 'Extra-Bold',
+  900: 'Ultra-Bold'
+};
+
