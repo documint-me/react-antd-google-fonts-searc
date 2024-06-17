@@ -1,6 +1,9 @@
-export type SearchLayoutProps = {}
-
 export type FontType = { family: string; variants: string[]; subsets: string[]; category?: string }
+
+export type SearchLayoutProps = {
+  addedFonts?: FontType[]
+  onChange?: (...args: any[]) => void
+}
 
 export type FontSortMapType = { [key: string]: FontType[] }
 

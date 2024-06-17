@@ -11,9 +11,8 @@ import Filters from 'ui/components/settings/filters'
 import ResetAllButton from 'ui/components/reset-all-button'
 import ResultsCount from 'ui/components/results-count'
 import EditFont from 'ui/components/manage-fonts/edit-font'
+import AddedFonts from 'ui/components/manage-fonts/added-fonts'
 import './style.css'
-
-// TODO modal to select subsets and add, manage fonts tab
 
 const SearchLayout = () => {
   const [openFilters, setOpenFilters] = useState(false)
@@ -30,7 +29,11 @@ const SearchLayout = () => {
           <Divider orientation="left">Filters</Divider>
           <Filters />
         </Drawer>
-        <Drawer title="My Fonts" placement="right" onClose={() => setOpenSettings(false)} open={openSettings}></Drawer>
+        <Drawer title="My Fonts" placement="right" onClose={() => setOpenSettings(false)} open={openSettings}>
+          <Row gutter={[16, 16]}>
+            <AddedFonts />
+          </Row>
+        </Drawer>
         <Row gutter={[16, 16]}>
           <Col span={21}>
             <SearchInput />
