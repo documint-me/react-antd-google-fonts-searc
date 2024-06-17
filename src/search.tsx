@@ -10,6 +10,7 @@ import Preview from 'ui/components/settings/preview'
 import Filters from 'ui/components/settings/filters'
 import ResetAllButton from 'ui/components/reset-all-button'
 import ResultsCount from 'ui/components/results-count'
+import EditFont from 'ui/components/manage-fonts/edit-font'
 import './style.css'
 
 // TODO modal to select subsets and add, manage fonts tab
@@ -20,6 +21,7 @@ const SearchLayout = () => {
 
   return (
     <SearchProvider>
+      <EditFont />
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
         <BackTop />
         <Drawer title={<ResetAllButton />} placement="right" onClose={() => setOpenFilters(false)} open={openFilters}>

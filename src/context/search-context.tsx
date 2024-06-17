@@ -4,6 +4,8 @@ import { texts } from 'helpers/constants'
 import { loadFontData, filterFonts } from 'helpers/load'
 
 export const SearchContext = React.createContext<{
+  editFontOpen: boolean
+  setEditFontOpen: (val: boolean) => void
   loading: boolean
   allFonts: FontSortMapType
   fonts: FontType[]
@@ -27,6 +29,8 @@ export const SearchContext = React.createContext<{
   suggest: (val: 'paragraph' | 'heading') => void
   resetAll: () => void
 }>({
+  editFontOpen: false,
+  setEditFontOpen: () => {},
   loading: false,
   allFonts: { popularity: [] },
   fonts: [],
@@ -53,6 +57,7 @@ export const SearchContext = React.createContext<{
 
 const SearchProvider = ({ children }: PropsWithChildren) => {
   const [loading, setLoading] = useState(false)
+  const [editFontOpen, setEditFontOpen] = useState(false)
   const [allFonts, setAllFonts] = useState<FontSortMapType>({ popularity: [] })
   const [fonts, setFonts] = useState<FontType[]>([])
   const [previewSize, setPreviewSize] = useState(30)
@@ -93,6 +98,8 @@ const SearchProvider = ({ children }: PropsWithChildren) => {
   return (
     <SearchContext.Provider
       value={{
+        editFontOpen,
+        setEditFontOpen,
         loading,
         fonts,
         allFonts,

@@ -3,6 +3,7 @@ import { useSearchContext } from 'context/search-context'
 import React, { FC } from 'react'
 import { FontType } from 'types/index'
 import FontSkeleton from '../font-skeleton'
+import WebFont from 'webfontloader'
 
 const { Text } = Typography
 
@@ -11,12 +12,26 @@ interface IFont {
 }
 
 const Font: FC<IFont> = ({ font }) => {
-  const { view, text, previewSize } = useSearchContext()
+  const { view, text, previewSize, setFont, setEditFontOpen } = useSearchContext()
   const isGrid = view === 'grid'
 
   return (
     <Col span={isGrid ? 6 : 24}>
-      <Card>
+      <Card
+        onClick={() => {
+          WebFont.load({
+            classes: false,
+            google: {
+              families: [font.family + ':' + font.variants.join(',') + ':' + font.subsets.join(',')],
+              text: 'acdedghilmnortuxBEILMNSTU0123456789-',
+            },
+            active: function () {
+              setFont(font)
+              setEditFontOpen(true)
+            },
+          })
+        }}
+      >
         <Row gutter={[16, 16]}>
           <Col span={12}>
             <Text strong>{font.family}</Text>
