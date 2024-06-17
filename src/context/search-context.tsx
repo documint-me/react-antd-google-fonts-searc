@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useContext, useState, useCallback, useEffect } from 'react'
 import { FontType, FontSortMapType } from '../types/index'
-import { texts, paragraphs, headings } from 'helpers/constants'
+import { texts } from 'helpers/constants'
 import { loadFontData, filterFonts } from 'helpers/load'
 
 export const SearchContext = React.createContext<{
@@ -17,8 +17,6 @@ export const SearchContext = React.createContext<{
   setCategory: (val: string) => void
   subset: string
   setSubset: (val: string) => void
-  filterType: string
-  setFilterType: (val: string) => void
   sort: string
   setSort: (val: string) => void
   text: string
@@ -42,8 +40,6 @@ export const SearchContext = React.createContext<{
   setSubset: () => {},
   subset: '',
   setCategory: () => {},
-  filterType: '',
-  setFilterType: () => {},
   sort: '',
   setSort: () => {},
   text: '',
@@ -63,8 +59,7 @@ const SearchProvider = ({ children }: PropsWithChildren) => {
   const [view, setView] = useState('grid')
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
-  const [subset, setSubset] = useState('')
-  const [filterType, setFilterType] = useState('category')
+  const [subset, setSubset] = useState('all')
   const [sort, setSort] = useState('popularity')
   const [text, setText] = useState('The quick brown fox jumps over the lazy dog.')
   const [font, setFont] = useState<FontType>({ family: '', variants: [], subsets: [] })
@@ -73,21 +68,13 @@ const SearchProvider = ({ children }: PropsWithChildren) => {
   const resetAll = useCallback(() => {
     setPreviewSize(30)
     setCategory('all')
-    setFilterType('category')
     setSort('popularity')
     setText('The quick brown fox jumps over the lazy dog.')
     setSubset('')
     setSearch('')
   }, [])
 
-  const suggest = useCallback(
-    (key: 'paragraph' | 'heading') =>
-      allFonts[sort] &&
-      setFonts(
-        filterFonts(allFonts, sort, category, 'suggestion', search, key === 'paragraph' ? paragraphs : headings)
-      ),
-    [allFonts, sort, category, search]
-  )
+  const suggest = useCallback((_key: 'paragraph' | 'heading') => {}, [])
 
   useEffect(() => {
     setLoading(true)
@@ -100,8 +87,8 @@ const SearchProvider = ({ children }: PropsWithChildren) => {
   }, [sort])
 
   useEffect(() => {
-    allFonts[sort] && setFonts(filterFonts(allFonts, sort, category, filterType, search))
-  }, [allFonts, sort, category, filterType, search])
+    allFonts[sort] && setFonts(filterFonts(allFonts, sort, category, subset, search))
+  }, [allFonts, sort, category, search, subset])
 
   return (
     <SearchContext.Provider
@@ -120,8 +107,6 @@ const SearchProvider = ({ children }: PropsWithChildren) => {
         setCategory,
         subset,
         setSubset,
-        filterType,
-        setFilterType,
         sort,
         setSort,
         text,

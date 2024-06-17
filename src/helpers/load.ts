@@ -24,53 +24,48 @@ export const loadFontData = async (sort: string): Promise<FontType[]> => {
   }
 }
 
-export const checkCategory = (font: FontType, category: string, filterType: string, suggestions: string[] = []) => {
-  if (category === 'all') {
+export const checkCategory = (font: FontType, category: string, subset: string) => {
+  if (category === 'all' && subset === 'all') {
     return true
   }
-
-  if (filterType === 'category') {
-    return font.category === category
-  } else if (filterType === 'suggestion') {
-    return suggestions.indexOf(font.family) > -1
-  } else if (filterType === 'subset') {
+  if (category === 'all' && subset !== 'all') {
     return font.subsets.indexOf(category) > -1
   }
+  if (category !== 'all' && subset === 'all') {
+    return font.category === category
+  }
+  return font.category === category && font.subsets.indexOf(category) > -1
 }
 
 export const filterFonts = (
   allFonts: FontSortMapType,
   sort: string,
   category: string,
-  filterType: string,
-  search: string,
-  suggestions?: string[]
+  subset: string,
+  search: string
 ) => {
   search = search.toLowerCase().trim()
   let fonts: string[] = []
   let data = allFonts[sort]
 
-  if (category !== 'all' || search.length > 0) {
-    data = data.filter(function (elem, i, arr) {
-      let isCategory = true,
-        isMatch = true
+  data = data.filter(function (elem) {
+    let isCategory = true,
+      isMatch = true
 
-      isCategory = Boolean(checkCategory(elem, category, filterType, suggestions ?? []))
+    isCategory = Boolean(checkCategory(elem, category, subset))
 
-      if (search.length > 0) {
-        isMatch = elem.family.toLowerCase().indexOf(search) !== -1
-      }
+    if (search.length > 0) {
+      isMatch = elem.family.toLowerCase().indexOf(search) !== -1
+    }
 
-      return isCategory && isMatch
-    })
-  }
+    return isCategory && isMatch
+  })
 
   data.forEach(font => {
     const hasRegular = font.variants.indexOf('regular') !== -1
-    //const hasLatin = ($.inArray('latin', font.variants) !== -1);
     let subsets = ''
 
-    if (filterType === 'subset' && category !== 'latin') {
+    if (subset !== 'latin') {
       if (font.subsets.indexOf('latin') !== -1) {
         subsets = ':latin,' + category
       } else {
