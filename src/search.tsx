@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { Col, Row, Divider, Button, Drawer, Space, BackTop } from 'antd'
 import { FilterOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons'
 import Fonts from 'ui/components/font'
@@ -12,15 +12,16 @@ import ResetAllButton from 'ui/components/reset-all-button'
 import ResultsCount from 'ui/components/results-count'
 import EditFont from 'ui/components/manage-fonts/edit-font'
 import AddedFonts from 'ui/components/manage-fonts/added-fonts'
+import { SearchLayoutProps } from './types'
 import './style.css'
 
-const SearchLayout = () => {
+const SearchLayout:FC<SearchLayoutProps> = ({ addedFonts, onChange }) => {
   const [openFilters, setOpenFilters] = useState(false)
   const [openSettings, setOpenSettings] = useState(false)
 
   return (
-    <SearchProvider>
-      <EditFont />
+    <SearchProvider addedFonts={addedFonts}>
+      <EditFont onChange={onChange} />
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
         <BackTop />
         <Drawer title={<ResetAllButton />} placement="right" onClose={() => setOpenFilters(false)} open={openFilters}>
@@ -31,7 +32,7 @@ const SearchLayout = () => {
         </Drawer>
         <Drawer title="My Fonts" placement="right" onClose={() => setOpenSettings(false)} open={openSettings}>
           <Row gutter={[16, 16]}>
-            <AddedFonts />
+            <AddedFonts onChange={onChange} />
           </Row>
         </Drawer>
         <Row gutter={[16, 16]}>

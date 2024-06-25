@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useContext, useState, useCallback, useEffect } from 'react'
+import React, { FC, PropsWithChildren, useContext, useState, useCallback, useEffect } from 'react'
 import { FontType, FontSortMapType } from '../types/index'
 import { texts } from 'helpers/constants'
 import { loadFontData, filterFonts } from 'helpers/load'
@@ -9,6 +9,8 @@ export const SearchContext = React.createContext<{
   loading: boolean
   allFonts: FontSortMapType
   fonts: FontType[]
+  savedFonts: FontType[]
+  setSavedFonts: (val: FontType[]) => void
   previewSize: number
   setPreviewSize: (val: number) => void
   view: string
@@ -34,6 +36,8 @@ export const SearchContext = React.createContext<{
   loading: false,
   allFonts: { popularity: [] },
   fonts: [],
+  savedFonts: [],
+  setSavedFonts: () => {},
   previewSize: 0,
   setPreviewSize: () => {},
   view: '',
@@ -55,11 +59,16 @@ export const SearchContext = React.createContext<{
   resetAll: () => {},
 })
 
-const SearchProvider = ({ children }: PropsWithChildren) => {
+interface ISearchProvider {
+  addedFonts?: FontType[]
+}
+
+const SearchProvider: FC<ISearchProvider & PropsWithChildren> = ({ addedFonts, children }) => {
   const [loading, setLoading] = useState(false)
   const [editFontOpen, setEditFontOpen] = useState(false)
   const [allFonts, setAllFonts] = useState<FontSortMapType>({ popularity: [] })
   const [fonts, setFonts] = useState<FontType[]>([])
+  const [savedFonts, setSavedFonts] = useState<FontType[]>(addedFonts ?? [])
   const [previewSize, setPreviewSize] = useState(30)
   const [view, setView] = useState('grid')
   const [search, setSearch] = useState('')
@@ -103,6 +112,8 @@ const SearchProvider = ({ children }: PropsWithChildren) => {
         loading,
         fonts,
         allFonts,
+        savedFonts,
+        setSavedFonts,
         previewSize,
         suggest,
         setPreviewSize,

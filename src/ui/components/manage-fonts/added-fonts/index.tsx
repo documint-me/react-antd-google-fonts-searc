@@ -4,19 +4,27 @@ import React, { FC } from 'react'
 import { FontType } from 'types/index'
 import WebFont from 'webfontloader'
 import { CloseOutlined } from '@ant-design/icons'
+import useFontSettings from 'hooks/useFonts'
 
 const { Text } = Typography
 
 interface IFont {
   font: FontType
+  onChange?: (...args: any[]) => void
 }
 
-const Font: FC<IFont> = ({ font }) => {
-  const { setFont, setEditFontOpen } = useSearchContext()
+interface IAddedFonts {
+  onChange?: (...args: any[]) => void
+}
+
+const Font: FC<IFont> = ({ font, onChange }) => {
+  const { savedFonts, setSavedFonts, setFont, setEditFontOpen } = useSearchContext()
+  const { deleteFont } = useFontSettings(savedFonts, setSavedFonts, onChange)
 
   return (
     <Col span={24}>
       <Card
+        style={{ cursor: 'pointer' }}
         onClick={() => {
           WebFont.load({
             classes: false,
@@ -44,7 +52,14 @@ const Font: FC<IFont> = ({ font }) => {
             </div>
           </Col>
           <Col span={3}>
-            <Button type="text" icon={<CloseOutlined />} onClick={(e) => e.stopPropagation()} />
+            <Button
+              type="text"
+              icon={<CloseOutlined />}
+              onClick={e => {
+                e.stopPropagation()
+                deleteFont(font)
+              }}
+            />
           </Col>
         </Row>
       </Card>
@@ -52,12 +67,12 @@ const Font: FC<IFont> = ({ font }) => {
   )
 }
 
-const AddedFonts = () => {
-  const { fonts } = useSearchContext()
+const AddedFonts: FC<IAddedFonts> = ({ onChange }) => {
+  const { savedFonts, fonts } = useSearchContext()
   return (
     <>
-      {fonts.length ? (
-        fonts.map((font, i) => <Font key={i} font={font} />)
+      {savedFonts.length ? (
+        savedFonts.map((font, i) => <Font key={i} onChange={onChange} font={fonts.find(f => f.family === font.family) ?? font} />)
       ) : (
         <Col span={24} style={{ textAlign: 'center' }}>
           <Text strong>You haven't added any fonts</Text>

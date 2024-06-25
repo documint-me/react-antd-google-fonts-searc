@@ -28,6 +28,7 @@ export const getLinkFormats = (font: FontType) => {
     css,
     fontFamily: value,
     google,
+    url
   }
 }
 
@@ -54,6 +55,7 @@ export const transformVariantsLinks = (variants: string[], fontFamily: string) =
 
     return {
       label: weightLabels[fontWeight],
+      variant,
       slug,
       style,
       weight: fontWeight,
