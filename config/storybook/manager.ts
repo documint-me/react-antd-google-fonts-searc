@@ -4,7 +4,7 @@ import { create } from "@storybook/theming";
 const theme = create({
   base: "dark",
 
-  brandTitle: "React JSON Schema Builder",
+  brandTitle: "React Gooogle Fonts Search",
   brandTarget: "_self",
 });
 
