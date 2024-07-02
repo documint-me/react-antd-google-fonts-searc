@@ -38,4 +38,4 @@ const Template: ComponentStory<typeof DefaultEditor> = () => {
   return <DefaultEditor />
 }
 
-export const Main = Template.bind({})
+export const Plugin = Template.bind({})
