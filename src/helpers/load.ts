@@ -1,20 +1,28 @@
 import WebFont from 'webfontloader'
 import { FontType, FontSortMapType } from 'types/index'
 
-export const loadFontData = async (sort: string): Promise<FontType[]> => {
+export const PAGE_SIZE = 1000
+
+export const SEARCH_PAGE_SIZE = 500
+
+export const loadFontData = async (sort: string, ignoreWebfontsLoad?: boolean): Promise<FontType[]> => {
   const url = 'https://www.googleapis.com/webfonts/v1/webfonts?'
   const key = process.env.REACT_APP_GOOGLE_API_KEY
 
   try {
     const res = await fetch(`${url}sort=${sort}&key=${key}`)
-    const resJson = await res.json()
+    const resJson: { items: FontType[] } = await res.json()
 
-    WebFont.load({
-      classes: false,
-      google: {
-        families: resJson.items.map((font: FontType) => font.family),
-        text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-      },
+    const pages = Math.ceil(resJson.items.length / PAGE_SIZE)
+
+    !ignoreWebfontsLoad && Array.from(Array(pages).keys()).forEach(page => {
+      WebFont.load({
+        classes: false,
+        google: {
+          families: [...resJson.items].slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map(font => font.family),
+          text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        },
+      })
     })
 
     return resJson.items
@@ -22,6 +30,16 @@ export const loadFontData = async (sort: string): Promise<FontType[]> => {
     console.error(url, (error as Error).toString())
     return []
   }
+}
+
+export const loadFonts = (fonts: FontType[]) => {
+  WebFont.load({
+    classes: false,
+    google: {
+      families: fonts.map((font: FontType) => font.family),
+      text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    },
+  })
 }
 
 export const checkCategory = (font: FontType, category: string, subset: string) => {
@@ -81,11 +99,14 @@ export const filterFonts = (
   })
 
   if (fonts.length > 0) {
-    WebFont.load({
-      classes: false,
-      google: {
-        families: fonts,
-      },
+    const pages = Math.ceil(fonts.length / SEARCH_PAGE_SIZE)
+    Array.from(Array(pages).keys()).forEach(page => {
+      WebFont.load({
+        classes: false,
+        google: {
+          families: fonts.slice(page * SEARCH_PAGE_SIZE, (page + 1) * SEARCH_PAGE_SIZE)
+        },
+      })
     })
   }
 
