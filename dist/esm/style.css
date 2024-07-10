@@ -3,6 +3,11 @@
   justify-content: flex-end;
 }
 
+.fonts-body {
+  height: 70vh;
+  overflow-y: auto;
+}
+
 .preview {
   position: relative;
   height: 100%;

@@ -249,22 +249,25 @@ var SearchContext = React.createContext({
     randomizeText: function () { },
     suggest: function () { },
     resetAll: function () { },
+    currentFontLoading: false,
+    setCurrentFontLoading: function () { },
 });
 var SearchProvider = function (_a) {
     var addedFonts = _a.addedFonts, children = _a.children;
     var _b = useState(false), loading = _b[0], setLoading = _b[1];
     var _c = useState(false), editFontOpen = _c[0], setEditFontOpen = _c[1];
-    var _d = useState({ popularity: [] }), allFonts = _d[0], setAllFonts = _d[1];
-    var _e = useState([]), fonts = _e[0], setFonts = _e[1];
-    var _f = useState(addedFonts !== null && addedFonts !== void 0 ? addedFonts : []), savedFonts = _f[0], setSavedFonts = _f[1];
-    var _g = useState(30), previewSize = _g[0], setPreviewSize = _g[1];
-    var _h = useState('grid'), view = _h[0], setView = _h[1];
-    var _j = useState(''), search = _j[0], setSearch = _j[1];
-    var _k = useState('all'), category = _k[0], setCategory = _k[1];
-    var _l = useState('all'), subset = _l[0], setSubset = _l[1];
-    var _m = useState('popularity'), sort = _m[0], setSort = _m[1];
-    var _o = useState('The quick brown fox jumps over the lazy dog.'), text = _o[0], setText = _o[1];
-    var _p = useState({ family: '', variants: [], subsets: [] }), font = _p[0], setFont = _p[1];
+    var _d = useState(false), currentFontLoading = _d[0], setCurrentFontLoading = _d[1];
+    var _e = useState({ popularity: [] }), allFonts = _e[0], setAllFonts = _e[1];
+    var _f = useState([]), fonts = _f[0], setFonts = _f[1];
+    var _g = useState(addedFonts !== null && addedFonts !== void 0 ? addedFonts : []), savedFonts = _g[0], setSavedFonts = _g[1];
+    var _h = useState(30), previewSize = _h[0], setPreviewSize = _h[1];
+    var _j = useState('grid'), view = _j[0], setView = _j[1];
+    var _k = useState(''), search = _k[0], setSearch = _k[1];
+    var _l = useState('all'), category = _l[0], setCategory = _l[1];
+    var _m = useState('all'), subset = _m[0], setSubset = _m[1];
+    var _o = useState('popularity'), sort = _o[0], setSort = _o[1];
+    var _p = useState('The quick brown fox jumps over the lazy dog.'), text = _p[0], setText = _p[1];
+    var _q = useState({ family: '', variants: [], subsets: [] }), font = _q[0], setFont = _q[1];
     var randomizeText = useCallback(function () { return setText(texts[Math.floor(Math.random() * texts.length)]); }, []);
     var resetAll = useCallback(function () {
         setPreviewSize(30);
@@ -323,6 +326,8 @@ var SearchProvider = function (_a) {
             setFont: setFont,
             randomizeText: randomizeText,
             resetAll: resetAll,
+            currentFontLoading: currentFontLoading,
+            setCurrentFontLoading: setCurrentFontLoading,
         } }, children));
 };
 var useSearchContext = function () { return useContext(SearchContext); };
@@ -338,10 +343,12 @@ var FontSkeleton = function () {
 var Text$5 = Typography.Text;
 var Font$1 = function (_a) {
     var font = _a.font;
-    var _b = useSearchContext(), view = _b.view, text = _b.text, previewSize = _b.previewSize, setFont = _b.setFont, setEditFontOpen = _b.setEditFontOpen;
+    var _b = useSearchContext(), view = _b.view, text = _b.text, previewSize = _b.previewSize, setFont = _b.setFont, setEditFontOpen = _b.setEditFontOpen, setCurrentFontLoading = _b.setCurrentFontLoading;
     var isGrid = view === 'grid';
     return (React.createElement(Col, { span: isGrid ? 6 : 24 },
         React.createElement(Card, { onClick: function () {
+                setFont(font);
+                setEditFontOpen(true);
                 WebFont.load({
                     classes: false,
                     google: {
@@ -349,8 +356,10 @@ var Font$1 = function (_a) {
                         text: 'acdedghilmnortuxBEILMNSTU0123456789-',
                     },
                     active: function () {
-                        setFont(font);
-                        setEditFontOpen(true);
+                        setCurrentFontLoading(false);
+                    },
+                    loading: function () {
+                        setCurrentFontLoading(true);
                     },
                 });
             } },
@@ -374,8 +383,8 @@ var Fonts = function () {
     var _a = useSearchContext(), loading = _a.loading, fonts = _a.fonts;
     return (React.createElement(React.Fragment, null,
         loading && [1, 2, 3, 4, 5, 6, 7, 8].map(function (val) { return React.createElement(FontSkeleton, { key: val }); }),
-        !loading && fonts.length ? (fonts.map(function (font, i) { return React.createElement(Font$1, { key: i, font: font }); })) : (React.createElement(Col, { span: 24, style: { textAlign: 'center' } },
-            React.createElement(Text$5, { strong: true }, "No fonts found")))));
+        !loading && (React.createElement(React.Fragment, null, fonts.length ? (fonts.map(function (font, i) { return React.createElement(Font$1, { key: i, font: font }); })) : (React.createElement(Col, { span: 24, style: { textAlign: 'center' } },
+            React.createElement(Text$5, { strong: true }, "No fonts found")))))));
 };
 
 var Search = Input.Search;
@@ -573,7 +582,7 @@ var useFontSettings = function (fonts, setFonts, onChange) {
 var Text$1 = Typography.Text;
 var EditFont = function (_a) {
     var onChange = _a.onChange;
-    var _b = useSearchContext(), font = _b.font, savedFonts = _b.savedFonts, setSavedFonts = _b.setSavedFonts, editFontOpen = _b.editFontOpen, setEditFontOpen = _b.setEditFontOpen;
+    var _b = useSearchContext(), font = _b.font, savedFonts = _b.savedFonts, setSavedFonts = _b.setSavedFonts, editFontOpen = _b.editFontOpen, setEditFontOpen = _b.setEditFontOpen, currentFontLoading = _b.currentFontLoading;
     var saveFont = useFontSettings(savedFonts, setSavedFonts, onChange).saveFont;
     var currentSavedFont = useMemo(function () { return savedFonts.find(function (f) { return f.family === font.family; }); }, [savedFonts, font]);
     var allFalse = useCallback(function (obj) { return Object.values(obj).every(function (value) { return !value; }); }, []);
@@ -608,7 +617,8 @@ var EditFont = function (_a) {
             React.createElement(Col, { span: 12 },
                 React.createElement("div", null,
                     React.createElement(Text$1, { strong: true }, "Variants")),
-                transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map(function (variant, i) {
+                currentFontLoading && React.createElement(Skeleton, { active: true }),
+                !currentFontLoading && transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map(function (variant, i) {
                     return (React.createElement("div", { key: i },
                         React.createElement(Checkbox, { style: variant.css, checked: variants[variant.variant], onChange: function (e) {
                                 var _a;
@@ -623,7 +633,8 @@ var EditFont = function (_a) {
             React.createElement(Col, { span: 12 },
                 React.createElement("div", null,
                     React.createElement(Text$1, { strong: true }, "Subsets")),
-                font.subsets.map(function (subset) {
+                currentFontLoading && React.createElement(Skeleton, { active: true }),
+                !currentFontLoading && font.subsets.map(function (subset) {
                     return (React.createElement("div", { key: subset },
                         React.createElement(Checkbox, { checked: subsets[subset], onChange: function (e) {
                                 var _a;
@@ -730,7 +741,7 @@ var SearchLayout = function (_a) {
                     React.createElement(ResultsCount, null)),
                 React.createElement(Col, { span: 12, className: "flex-end" },
                     React.createElement(ToggleView, null))),
-            React.createElement(Row, { gutter: [16, 16] },
+            React.createElement(Row, { gutter: [16, 16], className: 'fonts-body' },
                 React.createElement(Fonts, null)))));
 };
 

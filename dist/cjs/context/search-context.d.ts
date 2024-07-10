@@ -27,6 +27,8 @@ export declare const SearchContext: React.Context<{
     randomizeText: () => void;
     suggest: (val: 'paragraph' | 'heading') => void;
     resetAll: () => void;
+    currentFontLoading: boolean;
+    setCurrentFontLoading: (val: boolean) => void;
 }>;
 interface ISearchProvider {
     addedFonts?: FontType[];
@@ -59,5 +61,7 @@ export declare const useSearchContext: () => {
     randomizeText: () => void;
     suggest: (val: 'paragraph' | 'heading') => void;
     resetAll: () => void;
+    currentFontLoading: boolean;
+    setCurrentFontLoading: (val: boolean) => void;
 };
 export default SearchProvider;

@@ -257,22 +257,25 @@ var SearchContext = React__default["default"].createContext({
     randomizeText: function () { },
     suggest: function () { },
     resetAll: function () { },
+    currentFontLoading: false,
+    setCurrentFontLoading: function () { },
 });
 var SearchProvider = function (_a) {
     var addedFonts = _a.addedFonts, children = _a.children;
     var _b = React.useState(false), loading = _b[0], setLoading = _b[1];
     var _c = React.useState(false), editFontOpen = _c[0], setEditFontOpen = _c[1];
-    var _d = React.useState({ popularity: [] }), allFonts = _d[0], setAllFonts = _d[1];
-    var _e = React.useState([]), fonts = _e[0], setFonts = _e[1];
-    var _f = React.useState(addedFonts !== null && addedFonts !== void 0 ? addedFonts : []), savedFonts = _f[0], setSavedFonts = _f[1];
-    var _g = React.useState(30), previewSize = _g[0], setPreviewSize = _g[1];
-    var _h = React.useState('grid'), view = _h[0], setView = _h[1];
-    var _j = React.useState(''), search = _j[0], setSearch = _j[1];
-    var _k = React.useState('all'), category = _k[0], setCategory = _k[1];
-    var _l = React.useState('all'), subset = _l[0], setSubset = _l[1];
-    var _m = React.useState('popularity'), sort = _m[0], setSort = _m[1];
-    var _o = React.useState('The quick brown fox jumps over the lazy dog.'), text = _o[0], setText = _o[1];
-    var _p = React.useState({ family: '', variants: [], subsets: [] }), font = _p[0], setFont = _p[1];
+    var _d = React.useState(false), currentFontLoading = _d[0], setCurrentFontLoading = _d[1];
+    var _e = React.useState({ popularity: [] }), allFonts = _e[0], setAllFonts = _e[1];
+    var _f = React.useState([]), fonts = _f[0], setFonts = _f[1];
+    var _g = React.useState(addedFonts !== null && addedFonts !== void 0 ? addedFonts : []), savedFonts = _g[0], setSavedFonts = _g[1];
+    var _h = React.useState(30), previewSize = _h[0], setPreviewSize = _h[1];
+    var _j = React.useState('grid'), view = _j[0], setView = _j[1];
+    var _k = React.useState(''), search = _k[0], setSearch = _k[1];
+    var _l = React.useState('all'), category = _l[0], setCategory = _l[1];
+    var _m = React.useState('all'), subset = _m[0], setSubset = _m[1];
+    var _o = React.useState('popularity'), sort = _o[0], setSort = _o[1];
+    var _p = React.useState('The quick brown fox jumps over the lazy dog.'), text = _p[0], setText = _p[1];
+    var _q = React.useState({ family: '', variants: [], subsets: [] }), font = _q[0], setFont = _q[1];
     var randomizeText = React.useCallback(function () { return setText(texts[Math.floor(Math.random() * texts.length)]); }, []);
     var resetAll = React.useCallback(function () {
         setPreviewSize(30);
@@ -331,6 +334,8 @@ var SearchProvider = function (_a) {
             setFont: setFont,
             randomizeText: randomizeText,
             resetAll: resetAll,
+            currentFontLoading: currentFontLoading,
+            setCurrentFontLoading: setCurrentFontLoading,
         } }, children));
 };
 var useSearchContext = function () { return React.useContext(SearchContext); };
@@ -346,10 +351,12 @@ var FontSkeleton = function () {
 var Text$5 = antd.Typography.Text;
 var Font$1 = function (_a) {
     var font = _a.font;
-    var _b = useSearchContext(), view = _b.view, text = _b.text, previewSize = _b.previewSize, setFont = _b.setFont, setEditFontOpen = _b.setEditFontOpen;
+    var _b = useSearchContext(), view = _b.view, text = _b.text, previewSize = _b.previewSize, setFont = _b.setFont, setEditFontOpen = _b.setEditFontOpen, setCurrentFontLoading = _b.setCurrentFontLoading;
     var isGrid = view === 'grid';
     return (React__default["default"].createElement(antd.Col, { span: isGrid ? 6 : 24 },
         React__default["default"].createElement(antd.Card, { onClick: function () {
+                setFont(font);
+                setEditFontOpen(true);
                 WebFont.load({
                     classes: false,
                     google: {
@@ -357,8 +364,10 @@ var Font$1 = function (_a) {
                         text: 'acdedghilmnortuxBEILMNSTU0123456789-',
                     },
                     active: function () {
-                        setFont(font);
-                        setEditFontOpen(true);
+                        setCurrentFontLoading(false);
+                    },
+                    loading: function () {
+                        setCurrentFontLoading(true);
                     },
                 });
             } },
@@ -382,8 +391,8 @@ var Fonts = function () {
     var _a = useSearchContext(), loading = _a.loading, fonts = _a.fonts;
     return (React__default["default"].createElement(React__default["default"].Fragment, null,
         loading && [1, 2, 3, 4, 5, 6, 7, 8].map(function (val) { return React__default["default"].createElement(FontSkeleton, { key: val }); }),
-        !loading && fonts.length ? (fonts.map(function (font, i) { return React__default["default"].createElement(Font$1, { key: i, font: font }); })) : (React__default["default"].createElement(antd.Col, { span: 24, style: { textAlign: 'center' } },
-            React__default["default"].createElement(Text$5, { strong: true }, "No fonts found")))));
+        !loading && (React__default["default"].createElement(React__default["default"].Fragment, null, fonts.length ? (fonts.map(function (font, i) { return React__default["default"].createElement(Font$1, { key: i, font: font }); })) : (React__default["default"].createElement(antd.Col, { span: 24, style: { textAlign: 'center' } },
+            React__default["default"].createElement(Text$5, { strong: true }, "No fonts found")))))));
 };
 
 var Search = antd.Input.Search;
@@ -581,7 +590,7 @@ var useFontSettings = function (fonts, setFonts, onChange) {
 var Text$1 = antd.Typography.Text;
 var EditFont = function (_a) {
     var onChange = _a.onChange;
-    var _b = useSearchContext(), font = _b.font, savedFonts = _b.savedFonts, setSavedFonts = _b.setSavedFonts, editFontOpen = _b.editFontOpen, setEditFontOpen = _b.setEditFontOpen;
+    var _b = useSearchContext(), font = _b.font, savedFonts = _b.savedFonts, setSavedFonts = _b.setSavedFonts, editFontOpen = _b.editFontOpen, setEditFontOpen = _b.setEditFontOpen, currentFontLoading = _b.currentFontLoading;
     var saveFont = useFontSettings(savedFonts, setSavedFonts, onChange).saveFont;
     var currentSavedFont = React.useMemo(function () { return savedFonts.find(function (f) { return f.family === font.family; }); }, [savedFonts, font]);
     var allFalse = React.useCallback(function (obj) { return Object.values(obj).every(function (value) { return !value; }); }, []);
@@ -616,7 +625,8 @@ var EditFont = function (_a) {
             React__default["default"].createElement(antd.Col, { span: 12 },
                 React__default["default"].createElement("div", null,
                     React__default["default"].createElement(Text$1, { strong: true }, "Variants")),
-                transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map(function (variant, i) {
+                currentFontLoading && React__default["default"].createElement(antd.Skeleton, { active: true }),
+                !currentFontLoading && transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map(function (variant, i) {
                     return (React__default["default"].createElement("div", { key: i },
                         React__default["default"].createElement(antd.Checkbox, { style: variant.css, checked: variants[variant.variant], onChange: function (e) {
                                 var _a;
@@ -631,7 +641,8 @@ var EditFont = function (_a) {
             React__default["default"].createElement(antd.Col, { span: 12 },
                 React__default["default"].createElement("div", null,
                     React__default["default"].createElement(Text$1, { strong: true }, "Subsets")),
-                font.subsets.map(function (subset) {
+                currentFontLoading && React__default["default"].createElement(antd.Skeleton, { active: true }),
+                !currentFontLoading && font.subsets.map(function (subset) {
                     return (React__default["default"].createElement("div", { key: subset },
                         React__default["default"].createElement(antd.Checkbox, { checked: subsets[subset], onChange: function (e) {
                                 var _a;
@@ -738,7 +749,7 @@ var SearchLayout = function (_a) {
                     React__default["default"].createElement(ResultsCount, null)),
                 React__default["default"].createElement(antd.Col, { span: 12, className: "flex-end" },
                     React__default["default"].createElement(ToggleView, null))),
-            React__default["default"].createElement(antd.Row, { gutter: [16, 16] },
+            React__default["default"].createElement(antd.Row, { gutter: [16, 16], className: 'fonts-body' },
                 React__default["default"].createElement(Fonts, null)))));
 };
 
