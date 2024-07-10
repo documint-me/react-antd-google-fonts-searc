@@ -62,9 +62,8 @@ const EditFont: FC<IEditFont> = ({ onChange }) => {
           </div>
           {transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map((variant, i) => {
             return (
-              <div>
+              <div key={i}>
                 <Checkbox
-                  key={i}
                   style={variant.css}
                   checked={variants[variant.variant]}
                   onChange={e => setVariants({ ...variants, [variant.variant]: e.target.checked })}
@@ -81,9 +80,8 @@ const EditFont: FC<IEditFont> = ({ onChange }) => {
           </div>
           {font.subsets.map(subset => {
             return (
-              <div>
+              <div key={subset}>
                 <Checkbox
-                  key={subset}
                   checked={subsets[subset]}
                   onChange={e => setSubsets({ ...subsets, [subset]: e.target.checked })}
                 >

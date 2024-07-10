@@ -17,9 +17,47 @@ const DefaultEditor = () => {
       options={{
         height: '100vh',
         storageManager: false,
-        plugins: [
-            (e) => plugin(e, {})
-        ]
+        undoManager: { trackSelection: false },
+        selectorManager: { componentFirst: true },
+        projectData: {
+          pages: [
+            {
+              name: 'Home page',
+              component: `<h1>GrapesJS React Custom UI</h1>`,
+            },
+          ],
+        },
+        styleManager: {
+          sectors: [
+            {
+              name: 'Text',
+              open: true,
+              buildProps: [
+                'font-family',
+                'color',
+                'font-size',
+                'font-weight',
+                'line-height',
+                'letter-spacing',
+                'text-align',
+              ],
+              properties: [
+                {
+                  name: 'Font',
+                  property: 'font-family',
+                  type: 'font-select',
+                  full: true,
+                  default: 'inherit',
+                  options: [
+                    { id: 'inherit', name: '[same as parent]', value: 'inherit' },
+                    { id: 'Arial', name: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        plugins: [e => plugin(e, {})],
       }}
       onEditor={onEditor}
     />
