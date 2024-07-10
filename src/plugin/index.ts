@@ -44,18 +44,17 @@ export const plugin: Plugin<PluginOptions> = (editor, opts) => {
     const font = { id: value, name: name ?? value, value }
     const prop = editor.StyleManager.getProperty(String(section), String(property))
     // @ts-ignore
-    prop?.setOptions([...prop.getOptions(), font])
+    prop?.set('addedFonts', [...(prop?.get('addedFonts') ?? []), font])
   })
 
   editor.Commands.add('add-google-fonts', (editor, _sender, options) => {
     const { fonts } = options
     const prop = editor.StyleManager.getProperty(String(section), String(property))
     // @ts-ignore
-    prop?.setOptions([
-      // @ts-ignore
-      ...prop.getOptions(),
-      ...fonts.map((font: FontType) => ({ id: font.family.split(',')[0], name: font.family, value: font.family })),
-    ])
+    prop?.view.set(
+      'addedFonts',
+      fonts.map((font: FontType) => ({ id: font.family.split(',')[0], name: font.family, value: font.family }))
+    )
     fonts.forEach((font: FontType) => loadFontToCanvas(font))
   })
 
@@ -64,6 +63,7 @@ export const plugin: Plugin<PluginOptions> = (editor, opts) => {
     view: typeSelect.view.extend({
       init() {
         this.listenTo(this.model, 'change:value', this.addGoogleFont)
+        this.listenTo(this.model, 'change:addedFonts', this.updateOptions)
       },
       addGoogleFont() {
         const googleFonts = this.googleFonts
@@ -74,7 +74,7 @@ export const plugin: Plugin<PluginOptions> = (editor, opts) => {
         const selInp = this.input?.querySelector(`option[value='${fontName}']`)
 
         if (font && selInp.getAttribute('data-gf')) {
-          editor.runCommand('add-google-font', { name: font.family.split(',')[0], value: font.family })
+          editor.runCommand('add-google-font', { name: font.family.split(',')[0], value: font.family, font })
           loadFontToCanvas(font)
           // * add font to global manager
           options.onSelectGoogleFont?.(font)
@@ -92,6 +92,7 @@ export const plugin: Plugin<PluginOptions> = (editor, opts) => {
           let optGroupStr = ''
 
           const allFonts = (this.googleFonts as FontType[]) ?? (await loadFontData('popularity', true))
+          const addedFonts = this.model.get('addedFonts')
 
           this.googleFonts = allFonts
 
@@ -104,6 +105,18 @@ export const plugin: Plugin<PluginOptions> = (editor, opts) => {
                 style?: string
               }[],
             },
+            ...(addedFonts && addedFonts.length
+              ? [
+                  {
+                    label: 'Added Google Fonts',
+                    options: addedFonts as {
+                      value: string
+                      name?: string
+                      style?: string
+                    }[],
+                  },
+                ]
+              : []),
             {
               label: 'Google Fonts',
               options: allFonts.map(font => ({
