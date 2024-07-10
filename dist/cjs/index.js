@@ -766,17 +766,18 @@ var plugin = function (editor, opts) {
         doc.head.appendChild(link.get(0));
     };
     editor.Commands.add('add-google-font', function (editor, _sender, options) {
+        var _a;
         var name = options.name, value = options.value;
         var font = { id: value, name: name !== null && name !== void 0 ? name : value, value: value };
         var prop = editor.StyleManager.getProperty(String(section), String(property));
         // @ts-ignore
-        prop === null || prop === void 0 ? void 0 : prop.setOptions(__spreadArray(__spreadArray([], prop.getOptions(), true), [font], false));
+        prop === null || prop === void 0 ? void 0 : prop.set('addedFonts', __spreadArray(__spreadArray([], ((_a = prop === null || prop === void 0 ? void 0 : prop.get('addedFonts')) !== null && _a !== void 0 ? _a : []), true), [font], false));
     });
     editor.Commands.add('add-google-fonts', function (editor, _sender, options) {
         var fonts = options.fonts;
         var prop = editor.StyleManager.getProperty(String(section), String(property));
         // @ts-ignore
-        prop === null || prop === void 0 ? void 0 : prop.setOptions(__spreadArray(__spreadArray([], prop.getOptions(), true), fonts.map(function (font) { return ({ id: font.family.split(',')[0], name: font.family, value: font.family }); }), true));
+        prop === null || prop === void 0 ? void 0 : prop.view.set('addedFonts', fonts.map(function (font) { return ({ id: font.family.split(',')[0], name: font.family, value: font.family }); }));
         fonts.forEach(function (font) { return loadFontToCanvas(font); });
     });
     sm.addType('font-select', {
@@ -784,6 +785,7 @@ var plugin = function (editor, opts) {
         view: typeSelect.view.extend({
             init: function () {
                 this.listenTo(this.model, 'change:value', this.addGoogleFont);
+                this.listenTo(this.model, 'change:addedFonts', this.updateOptions);
             },
             addGoogleFont: function () {
                 var _a, _b;
@@ -792,7 +794,7 @@ var plugin = function (editor, opts) {
                 var font = googleFonts.find(function (font) { return font.family === fontName; });
                 var selInp = (_a = this.input) === null || _a === void 0 ? void 0 : _a.querySelector("option[value='".concat(fontName, "']"));
                 if (font && selInp.getAttribute('data-gf')) {
-                    editor.runCommand('add-google-font', { name: font.family.split(',')[0], value: font.family });
+                    editor.runCommand('add-google-font', { name: font.family.split(',')[0], value: font.family, font: font });
                     loadFontToCanvas(font);
                     // * add font to global manager
                     (_b = options.onSelectGoogleFont) === null || _b === void 0 ? void 0 : _b.call(options, font);
@@ -808,7 +810,7 @@ var plugin = function (editor, opts) {
             onRender: function () {
                 var _a;
                 return __awaiter(this, void 0, void 0, function () {
-                    var optGroupStr_1, allFonts, _b, localFonts, inputH;
+                    var optGroupStr_1, allFonts, _b, addedFonts, localFonts, inputH;
                     return __generator(this, function (_c) {
                         switch (_c.label) {
                             case 0:
@@ -823,12 +825,21 @@ var plugin = function (editor, opts) {
                                 _c.label = 3;
                             case 3:
                                 allFonts = _b;
+                                addedFonts = this.model.get('addedFonts');
                                 this.googleFonts = allFonts;
-                                localFonts = [
+                                localFonts = __spreadArray(__spreadArray([
                                     {
                                         label: 'User Fonts',
                                         options: this.model.getOptions(),
-                                    },
+                                    }
+                                ], (addedFonts && addedFonts.length
+                                    ? [
+                                        {
+                                            label: 'Added Google Fonts',
+                                            options: addedFonts,
+                                        },
+                                    ]
+                                    : []), true), [
                                     {
                                         label: 'Google Fonts',
                                         options: allFonts.map(function (font) { return ({
@@ -838,7 +849,7 @@ var plugin = function (editor, opts) {
                                             'data-gf': 1,
                                         }); }),
                                     },
-                                ];
+                                ], false);
                                 this.fontOptions = localFonts;
                                 localFonts.forEach(function (group) {
                                     var groupStyle = group.style ? group.style.replace(/"/g, '&quot;') : '';
