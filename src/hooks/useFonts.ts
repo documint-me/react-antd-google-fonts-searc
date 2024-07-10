@@ -15,7 +15,6 @@ const useFontSettings = (
         setFonts(fontsToUpdate)
         onChange?.(fontsToUpdate)
       } else {
-        console.log([...fonts, font])
         setFonts([...fonts, font])
         onChange?.([...fonts, font])
       }

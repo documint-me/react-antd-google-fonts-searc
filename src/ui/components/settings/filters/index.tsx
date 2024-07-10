@@ -1,4 +1,4 @@
-import { Col, Radio, Row, Typography } from 'antd'
+import { Col, Row, Typography, Select } from 'antd'
 import React from 'react'
 import { useSearchContext } from 'context/search-context'
 
@@ -8,13 +8,14 @@ const Filters = () => {
   const { category, setCategory, subset, setSubset } = useSearchContext()
   return (
     <Row gutter={[16, 16]}>
-      <Col span={24}>
+      <Col span={12}>
         <div style={{ marginBottom: 5 }}>
           <Text type="secondary">Category:</Text>
         </div>
-        <Radio.Group
+        <Select
           value={category}
-          onChange={e => setCategory(e.target.value)}
+          onChange={val => setCategory(val)}
+          style={{ width: '100%' }}
           options={[
             { label: 'All', value: 'all' },
             { label: 'Sans-Serif', value: 'sans-serif' },
@@ -23,17 +24,16 @@ const Filters = () => {
             { label: 'Handwriting', value: 'handwriting' },
             { label: 'Monospace', value: 'monospace' },
           ]}
-          optionType="button"
-          buttonStyle="solid"
         />
       </Col>
-      <Col span={24}>
+      <Col span={12}>
         <div style={{ marginBottom: 5 }}>
           <Text type="secondary">Subset:</Text>
         </div>
-        <Radio.Group
+        <Select
           value={subset}
-          onChange={e => setSubset(e.target.value)}
+          onChange={val => setSubset(val)}
+          style={{ width: '100%' }}
           options={[
             { label: 'All', value: 'all' },
             { label: 'Arabic', value: 'arabic' },
@@ -51,8 +51,6 @@ const Filters = () => {
             { label: 'Thai', value: 'thai' },
             { label: 'Vietnamese', value: 'vietnamese' },
           ]}
-          optionType="button"
-          buttonStyle="solid"
         />
       </Col>
     </Row>

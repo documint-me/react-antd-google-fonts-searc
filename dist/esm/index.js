@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useContext, useMemo } from 'react';
-import { Col, Card, Skeleton, Typography, Row, Input, Select, Segmented, Button, Slider, Radio, Modal, message, Checkbox, Space, BackTop, Drawer, Divider } from 'antd';
+import { Col, Card, Skeleton, Typography, Row, Input, Select, Segmented, Button, Slider, Modal, message, Checkbox, Space, BackTop, Drawer, Divider } from 'antd';
 import { AppstoreOutlined, BarsOutlined, ReloadOutlined, CloseOutlined, FilterOutlined, SettingOutlined } from '@ant-design/icons';
 
 /******************************************************************************
@@ -441,21 +441,21 @@ var Text$3 = Typography.Text;
 var Filters = function () {
     var _a = useSearchContext(), category = _a.category, setCategory = _a.setCategory, subset = _a.subset, setSubset = _a.setSubset;
     return (React.createElement(Row, { gutter: [16, 16] },
-        React.createElement(Col, { span: 24 },
+        React.createElement(Col, { span: 12 },
             React.createElement("div", { style: { marginBottom: 5 } },
                 React.createElement(Text$3, { type: "secondary" }, "Category:")),
-            React.createElement(Radio.Group, { value: category, onChange: function (e) { return setCategory(e.target.value); }, options: [
+            React.createElement(Select, { value: category, onChange: function (val) { return setCategory(val); }, style: { width: '100%' }, options: [
                     { label: 'All', value: 'all' },
                     { label: 'Sans-Serif', value: 'sans-serif' },
                     { label: 'Serif', value: 'serif' },
                     { label: 'Display', value: 'display' },
                     { label: 'Handwriting', value: 'handwriting' },
                     { label: 'Monospace', value: 'monospace' },
-                ], optionType: "button", buttonStyle: "solid" })),
-        React.createElement(Col, { span: 24 },
+                ] })),
+        React.createElement(Col, { span: 12 },
             React.createElement("div", { style: { marginBottom: 5 } },
                 React.createElement(Text$3, { type: "secondary" }, "Subset:")),
-            React.createElement(Radio.Group, { value: subset, onChange: function (e) { return setSubset(e.target.value); }, options: [
+            React.createElement(Select, { value: subset, onChange: function (val) { return setSubset(val); }, style: { width: '100%' }, options: [
                     { label: 'All', value: 'all' },
                     { label: 'Arabic', value: 'arabic' },
                     { label: 'Cyrillic', value: 'cyrillic' },
@@ -471,7 +471,7 @@ var Filters = function () {
                     { label: 'Telugu', value: 'telugu' },
                     { label: 'Thai', value: 'thai' },
                     { label: 'Vietnamese', value: 'vietnamese' },
-                ], optionType: "button", buttonStyle: "solid" }))));
+                ] }))));
 };
 
 var ResetAllButton = function () {
@@ -559,7 +559,6 @@ var useFontSettings = function (fonts, setFonts, onChange) {
             onChange === null || onChange === void 0 ? void 0 : onChange(fontsToUpdate);
         }
         else {
-            console.log(__spreadArray(__spreadArray([], fonts, true), [font], false));
             setFonts(__spreadArray(__spreadArray([], fonts, true), [font], false));
             onChange === null || onChange === void 0 ? void 0 : onChange(__spreadArray(__spreadArray([], fonts, true), [font], false));
         }
@@ -662,13 +661,21 @@ var Font = function (_a) {
                     },
                 });
             } },
-            React.createElement(Row, { gutter: 16 },
+            React.createElement(Row, { gutter: [16, 16] },
+                React.createElement(Col, { span: 12 },
+                    React.createElement(Text, { strong: true }, font.family)),
+                React.createElement(Col, { span: 12, style: { display: 'flex', justifyContent: 'flex-end' } },
+                    React.createElement(Text, { type: "secondary" },
+                        font.variants.length,
+                        " Style",
+                        font.variants.length === 1 ? '' : 's')),
                 React.createElement(Col, { span: 21 },
-                    React.createElement("div", { style: {
+                    React.createElement("div", { className: "preview", style: {
+                            fontSize: 20,
                             fontFamily: "'" + font.family + "'",
                         } },
                         React.createElement("div", null,
-                            React.createElement("span", null, font.family)))),
+                            React.createElement("span", null, "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789")))),
                 React.createElement(Col, { span: 3 },
                     React.createElement(Button, { type: "text", icon: React.createElement(CloseOutlined, null), onClick: function (e) {
                             e.stopPropagation();
@@ -678,7 +685,10 @@ var Font = function (_a) {
 var AddedFonts = function (_a) {
     var onChange = _a.onChange;
     var _b = useSearchContext(), savedFonts = _b.savedFonts, fonts = _b.fonts;
-    return (React.createElement(React.Fragment, null, savedFonts.length ? (savedFonts.map(function (font, i) { var _a; return React.createElement(Font, { key: i, onChange: onChange, font: (_a = fonts.find(function (f) { return f.family === font.family; })) !== null && _a !== void 0 ? _a : font }); })) : (React.createElement(Col, { span: 24, style: { textAlign: 'center' } },
+    return (React.createElement(React.Fragment, null, savedFonts.length ? (savedFonts.map(function (font, i) {
+        var _a;
+        return (React.createElement(Font, { key: i, onChange: onChange, font: (_a = fonts.find(function (f) { return f.family === font.family; })) !== null && _a !== void 0 ? _a : font }));
+    })) : (React.createElement(Col, { span: 24, style: { textAlign: 'center' } },
         React.createElement(Text, { strong: true }, "You haven't added any fonts")))));
 };
 
@@ -769,7 +779,9 @@ var plugin = function (editor, opts) {
         var fonts = options.fonts;
         var prop = editor.StyleManager.getProperty(String(section), String(property));
         // @ts-ignore
-        prop === null || prop === void 0 ? void 0 : prop.view.set('addedFonts', fonts.map(function (font) { return ({ id: font.family.split(',')[0], name: font.family, value: font.family }); }));
+        prop === null || prop === void 0 ? void 0 : prop.set(
+        // @ts-ignore
+        'addedFonts', fonts.map(function (font) { return ({ id: font.family.split(',')[0], name: font.family, value: font.family }); }));
         fonts.forEach(function (font) { return loadFontToCanvas(font); });
     });
     sm.addType('font-select', {

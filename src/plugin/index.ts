@@ -51,7 +51,8 @@ export const plugin: Plugin<PluginOptions> = (editor, opts) => {
     const { fonts } = options
     const prop = editor.StyleManager.getProperty(String(section), String(property))
     // @ts-ignore
-    prop?.view.set(
+    prop?.set(
+      // @ts-ignore
       'addedFonts',
       fonts.map((font: FontType) => ({ id: font.family.split(',')[0], name: font.family, value: font.family }))
     )

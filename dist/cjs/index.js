@@ -449,21 +449,21 @@ var Text$3 = antd.Typography.Text;
 var Filters = function () {
     var _a = useSearchContext(), category = _a.category, setCategory = _a.setCategory, subset = _a.subset, setSubset = _a.setSubset;
     return (React__default["default"].createElement(antd.Row, { gutter: [16, 16] },
-        React__default["default"].createElement(antd.Col, { span: 24 },
+        React__default["default"].createElement(antd.Col, { span: 12 },
             React__default["default"].createElement("div", { style: { marginBottom: 5 } },
                 React__default["default"].createElement(Text$3, { type: "secondary" }, "Category:")),
-            React__default["default"].createElement(antd.Radio.Group, { value: category, onChange: function (e) { return setCategory(e.target.value); }, options: [
+            React__default["default"].createElement(antd.Select, { value: category, onChange: function (val) { return setCategory(val); }, style: { width: '100%' }, options: [
                     { label: 'All', value: 'all' },
                     { label: 'Sans-Serif', value: 'sans-serif' },
                     { label: 'Serif', value: 'serif' },
                     { label: 'Display', value: 'display' },
                     { label: 'Handwriting', value: 'handwriting' },
                     { label: 'Monospace', value: 'monospace' },
-                ], optionType: "button", buttonStyle: "solid" })),
-        React__default["default"].createElement(antd.Col, { span: 24 },
+                ] })),
+        React__default["default"].createElement(antd.Col, { span: 12 },
             React__default["default"].createElement("div", { style: { marginBottom: 5 } },
                 React__default["default"].createElement(Text$3, { type: "secondary" }, "Subset:")),
-            React__default["default"].createElement(antd.Radio.Group, { value: subset, onChange: function (e) { return setSubset(e.target.value); }, options: [
+            React__default["default"].createElement(antd.Select, { value: subset, onChange: function (val) { return setSubset(val); }, style: { width: '100%' }, options: [
                     { label: 'All', value: 'all' },
                     { label: 'Arabic', value: 'arabic' },
                     { label: 'Cyrillic', value: 'cyrillic' },
@@ -479,7 +479,7 @@ var Filters = function () {
                     { label: 'Telugu', value: 'telugu' },
                     { label: 'Thai', value: 'thai' },
                     { label: 'Vietnamese', value: 'vietnamese' },
-                ], optionType: "button", buttonStyle: "solid" }))));
+                ] }))));
 };
 
 var ResetAllButton = function () {
@@ -567,7 +567,6 @@ var useFontSettings = function (fonts, setFonts, onChange) {
             onChange === null || onChange === void 0 ? void 0 : onChange(fontsToUpdate);
         }
         else {
-            console.log(__spreadArray(__spreadArray([], fonts, true), [font], false));
             setFonts(__spreadArray(__spreadArray([], fonts, true), [font], false));
             onChange === null || onChange === void 0 ? void 0 : onChange(__spreadArray(__spreadArray([], fonts, true), [font], false));
         }
@@ -670,13 +669,21 @@ var Font = function (_a) {
                     },
                 });
             } },
-            React__default["default"].createElement(antd.Row, { gutter: 16 },
+            React__default["default"].createElement(antd.Row, { gutter: [16, 16] },
+                React__default["default"].createElement(antd.Col, { span: 12 },
+                    React__default["default"].createElement(Text, { strong: true }, font.family)),
+                React__default["default"].createElement(antd.Col, { span: 12, style: { display: 'flex', justifyContent: 'flex-end' } },
+                    React__default["default"].createElement(Text, { type: "secondary" },
+                        font.variants.length,
+                        " Style",
+                        font.variants.length === 1 ? '' : 's')),
                 React__default["default"].createElement(antd.Col, { span: 21 },
-                    React__default["default"].createElement("div", { style: {
+                    React__default["default"].createElement("div", { className: "preview", style: {
+                            fontSize: 20,
                             fontFamily: "'" + font.family + "'",
                         } },
                         React__default["default"].createElement("div", null,
-                            React__default["default"].createElement("span", null, font.family)))),
+                            React__default["default"].createElement("span", null, "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789")))),
                 React__default["default"].createElement(antd.Col, { span: 3 },
                     React__default["default"].createElement(antd.Button, { type: "text", icon: React__default["default"].createElement(icons.CloseOutlined, null), onClick: function (e) {
                             e.stopPropagation();
@@ -686,7 +693,10 @@ var Font = function (_a) {
 var AddedFonts = function (_a) {
     var onChange = _a.onChange;
     var _b = useSearchContext(), savedFonts = _b.savedFonts, fonts = _b.fonts;
-    return (React__default["default"].createElement(React__default["default"].Fragment, null, savedFonts.length ? (savedFonts.map(function (font, i) { var _a; return React__default["default"].createElement(Font, { key: i, onChange: onChange, font: (_a = fonts.find(function (f) { return f.family === font.family; })) !== null && _a !== void 0 ? _a : font }); })) : (React__default["default"].createElement(antd.Col, { span: 24, style: { textAlign: 'center' } },
+    return (React__default["default"].createElement(React__default["default"].Fragment, null, savedFonts.length ? (savedFonts.map(function (font, i) {
+        var _a;
+        return (React__default["default"].createElement(Font, { key: i, onChange: onChange, font: (_a = fonts.find(function (f) { return f.family === font.family; })) !== null && _a !== void 0 ? _a : font }));
+    })) : (React__default["default"].createElement(antd.Col, { span: 24, style: { textAlign: 'center' } },
         React__default["default"].createElement(Text, { strong: true }, "You haven't added any fonts")))));
 };
 
@@ -777,7 +787,9 @@ var plugin = function (editor, opts) {
         var fonts = options.fonts;
         var prop = editor.StyleManager.getProperty(String(section), String(property));
         // @ts-ignore
-        prop === null || prop === void 0 ? void 0 : prop.view.set('addedFonts', fonts.map(function (font) { return ({ id: font.family.split(',')[0], name: font.family, value: font.family }); }));
+        prop === null || prop === void 0 ? void 0 : prop.set(
+        // @ts-ignore
+        'addedFonts', fonts.map(function (font) { return ({ id: font.family.split(',')[0], name: font.family, value: font.family }); }));
         fonts.forEach(function (font) { return loadFontToCanvas(font); });
     });
     sm.addType('font-select', {

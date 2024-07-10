@@ -39,15 +39,25 @@ const Font: FC<IFont> = ({ font, onChange }) => {
           })
         }}
       >
-        <Row gutter={16}>
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Text strong>{font.family}</Text>
+          </Col>
+          <Col span={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Text type="secondary">
+              {font.variants.length} Style{font.variants.length === 1 ? '' : 's'}
+            </Text>
+          </Col>
           <Col span={21}>
             <div
+              className="preview"
               style={{
+                fontSize: 20,
                 fontFamily: "'" + font.family + "'",
               }}
             >
               <div>
-                <span>{font.family}</span>
+                <span>AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789</span>
               </div>
             </div>
           </Col>
@@ -72,7 +82,9 @@ const AddedFonts: FC<IAddedFonts> = ({ onChange }) => {
   return (
     <>
       {savedFonts.length ? (
-        savedFonts.map((font, i) => <Font key={i} onChange={onChange} font={fonts.find(f => f.family === font.family) ?? font} />)
+        savedFonts.map((font, i) => (
+          <Font key={i} onChange={onChange} font={fonts.find(f => f.family === font.family) ?? font} />
+        ))
       ) : (
         <Col span={24} style={{ textAlign: 'center' }}>
           <Text strong>You haven't added any fonts</Text>
