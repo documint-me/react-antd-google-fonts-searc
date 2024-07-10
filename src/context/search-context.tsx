@@ -30,6 +30,8 @@ export const SearchContext = React.createContext<{
   randomizeText: () => void
   suggest: (val: 'paragraph' | 'heading') => void
   resetAll: () => void
+  currentFontLoading: boolean
+  setCurrentFontLoading: (val: boolean) => void
 }>({
   editFontOpen: false,
   setEditFontOpen: () => {},
@@ -57,6 +59,8 @@ export const SearchContext = React.createContext<{
   randomizeText: () => {},
   suggest: () => {},
   resetAll: () => {},
+  currentFontLoading: false,
+  setCurrentFontLoading: () => {},
 })
 
 interface ISearchProvider {
@@ -66,6 +70,7 @@ interface ISearchProvider {
 const SearchProvider: FC<ISearchProvider & PropsWithChildren> = ({ addedFonts, children }) => {
   const [loading, setLoading] = useState(false)
   const [editFontOpen, setEditFontOpen] = useState(false)
+  const [currentFontLoading, setCurrentFontLoading] = useState(false)
   const [allFonts, setAllFonts] = useState<FontSortMapType>({ popularity: [] })
   const [fonts, setFonts] = useState<FontType[]>([])
   const [savedFonts, setSavedFonts] = useState<FontType[]>(addedFonts ?? [])
@@ -133,6 +138,8 @@ const SearchProvider: FC<ISearchProvider & PropsWithChildren> = ({ addedFonts, c
         setFont,
         randomizeText,
         resetAll,
+        currentFontLoading,
+        setCurrentFontLoading,
       }}
     >
       {children}

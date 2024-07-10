@@ -12,13 +12,15 @@ interface IFont {
 }
 
 const Font: FC<IFont> = ({ font }) => {
-  const { view, text, previewSize, setFont, setEditFontOpen } = useSearchContext()
+  const { view, text, previewSize, setFont, setEditFontOpen, setCurrentFontLoading } = useSearchContext()
   const isGrid = view === 'grid'
 
   return (
     <Col span={isGrid ? 6 : 24}>
       <Card
         onClick={() => {
+          setFont(font)
+          setEditFontOpen(true)
           WebFont.load({
             classes: false,
             google: {
@@ -26,8 +28,10 @@ const Font: FC<IFont> = ({ font }) => {
               text: 'acdedghilmnortuxBEILMNSTU0123456789-',
             },
             active: function () {
-              setFont(font)
-              setEditFontOpen(true)
+              setCurrentFontLoading(false)
+            },
+            loading: function () {
+              setCurrentFontLoading(true)
             },
           })
         }}
@@ -65,12 +69,16 @@ const Fonts = () => {
   return (
     <>
       {loading && [1, 2, 3, 4, 5, 6, 7, 8].map(val => <FontSkeleton key={val} />)}
-      {!loading && fonts.length ? (
-        fonts.map((font, i) => <Font key={i} font={font} />)
-      ) : (
-        <Col span={24} style={{ textAlign: 'center' }}>
-          <Text strong>No fonts found</Text>
-        </Col>
+      {!loading && (
+        <>
+          {fonts.length ? (
+            fonts.map((font, i) => <Font key={i} font={font} />)
+          ) : (
+            <Col span={24} style={{ textAlign: 'center' }}>
+              <Text strong>No fonts found</Text>
+            </Col>
+          )}
+        </>
       )}
     </>
   )

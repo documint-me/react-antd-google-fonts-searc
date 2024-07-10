@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { Modal, Row, Col, Checkbox, Typography, message } from 'antd'
+import { Modal, Row, Col, Checkbox, Skeleton, Typography, message } from 'antd'
 import { useSearchContext } from 'context/search-context'
 import { getLinkFormats, transformVariantsLinks } from 'helpers/generators'
 import useFontSettings from 'hooks/useFonts'
@@ -11,7 +11,7 @@ interface IEditFont {
 }
 
 const EditFont: FC<IEditFont> = ({ onChange }) => {
-  const { font, savedFonts, setSavedFonts, editFontOpen, setEditFontOpen } = useSearchContext()
+  const { font, savedFonts, setSavedFonts, editFontOpen, setEditFontOpen, currentFontLoading } = useSearchContext()
   const { saveFont } = useFontSettings(savedFonts, setSavedFonts, onChange)
   const currentSavedFont = useMemo(() => savedFonts.find(f => f.family === font.family), [savedFonts, font])
 
@@ -60,7 +60,8 @@ const EditFont: FC<IEditFont> = ({ onChange }) => {
           <div>
             <Text strong>Variants</Text>
           </div>
-          {transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map((variant, i) => {
+          {currentFontLoading && <Skeleton active/>}
+          {!currentFontLoading && transformVariantsLinks(font.variants.sort(), getLinkFormats(font).fontFamily).map((variant, i) => {
             return (
               <div key={i}>
                 <Checkbox
@@ -78,7 +79,8 @@ const EditFont: FC<IEditFont> = ({ onChange }) => {
           <div>
             <Text strong>Subsets</Text>
           </div>
-          {font.subsets.map(subset => {
+          {currentFontLoading && <Skeleton active/>}
+          {!currentFontLoading && font.subsets.map(subset => {
             return (
               <div key={subset}>
                 <Checkbox

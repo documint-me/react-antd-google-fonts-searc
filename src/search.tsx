@@ -70,7 +70,7 @@ const SearchLayout:FC<SearchLayoutProps> = ({ addedFonts, onChange }) => {
             <ToggleView />
           </Col>
         </Row>
-        <Row gutter={[16, 16]}>
+        <Row gutter={[16, 16]} className='fonts-body'>
           <Fonts />
         </Row>
       </Space>
