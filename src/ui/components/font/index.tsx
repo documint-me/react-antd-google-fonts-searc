@@ -74,9 +74,11 @@ const Fonts = () => {
   const currentFonts = useMemo(() => [...fonts].slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [fonts, page])
 
   useEffect(() => {
-    loadFonts(currentFonts)
-    loadFontsWithSubsets(currentFonts, category, subset)
-  }, [page])
+    if (currentFonts.length) {
+      loadFonts(currentFonts)
+      loadFontsWithSubsets(currentFonts, category, subset)
+    }
+  }, [currentFonts])
 
   useEffect(() => {
     setPage(1)
