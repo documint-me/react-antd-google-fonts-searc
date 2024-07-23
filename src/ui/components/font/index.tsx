@@ -1,9 +1,10 @@
 import { Card, Col, Row, Typography, Pagination } from 'antd'
 import { useSearchContext } from 'context/search-context'
-import React, { FC, useCallback, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { FontType } from 'types/index'
 import FontSkeleton from '../font-skeleton'
 import WebFont from 'webfontloader'
+import { loadFonts, loadFontsWithSubsets } from 'helpers/load'
 
 const { Text } = Typography
 
@@ -67,8 +68,19 @@ const Font: FC<IFont> = ({ font }) => {
 }
 
 const Fonts = () => {
-  const { loading, fonts } = useSearchContext()
+  const { loading, fonts, search, category, subset, sort } = useSearchContext()
   const [page, setPage] = useState(1)
+
+  const currentFonts = useMemo(() => [...fonts].slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [fonts, page])
+
+  useEffect(() => {
+    loadFonts(currentFonts)
+    loadFontsWithSubsets(currentFonts, category, subset)
+  }, [page])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, category, subset, sort])
 
   return (
     <>
@@ -87,7 +99,7 @@ const Fonts = () => {
                 <Pagination simple current={page} total={fonts.length} defaultPageSize={PAGE_SIZE} onChange={setPage} />
               </div>
               <Row gutter={[16, 16]} className="fonts-body">
-                {[...fonts].slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((font, i) => (
+                {currentFonts.map((font, i) => (
                   <Font key={i} font={font} />
                 ))}
               </Row>

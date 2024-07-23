@@ -1,11 +1,7 @@
 import WebFont from 'webfontloader'
 import { FontType, FontSortMapType } from 'types/index'
 
-export const PAGE_SIZE = 1000
-
-export const SEARCH_PAGE_SIZE = 500
-
-export const loadFontData = async (sort: string, ignoreWebfontsLoad?: boolean): Promise<FontType[]> => {
+export const loadFontData = async (sort: string, _ignoreWebfontsLoad?: boolean): Promise<FontType[]> => {
   const url = 'https://www.googleapis.com/webfonts/v1/webfonts?'
   const key = process.env.REACT_APP_GOOGLE_API_KEY
 
@@ -13,33 +9,11 @@ export const loadFontData = async (sort: string, ignoreWebfontsLoad?: boolean): 
     const res = await fetch(`${url}sort=${sort}&key=${key}`)
     const resJson: { items: FontType[] } = await res.json()
 
-    const pages = Math.ceil(resJson.items.length / PAGE_SIZE)
-
-    !ignoreWebfontsLoad && Array.from(Array(pages).keys()).forEach(page => {
-      WebFont.load({
-        classes: false,
-        google: {
-          families: [...resJson.items].slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map(font => font.family),
-          text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-        },
-      })
-    })
-
     return resJson.items
   } catch (error) {
     console.error(url, (error as Error).toString())
     return []
   }
-}
-
-export const loadFonts = (fonts: FontType[]) => {
-  WebFont.load({
-    classes: false,
-    google: {
-      families: fonts.map((font: FontType) => font.family),
-      text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-    },
-  })
 }
 
 export const checkCategory = (font: FontType, category: string, subset: string) => {
@@ -63,10 +37,8 @@ export const filterFonts = (
   search: string
 ) => {
   search = search.toLowerCase().trim()
-  let fonts: string[] = []
-  let data = allFonts[sort]
 
-  data = data.filter(function (elem) {
+  return allFonts[sort].filter(function (elem) {
     let isCategory = true,
       isMatch = true
 
@@ -78,8 +50,22 @@ export const filterFonts = (
 
     return isCategory && isMatch
   })
+}
 
-  data.forEach(font => {
+export const loadFonts = (fonts: FontType[]) => {
+  WebFont.load({
+    classes: false,
+    google: {
+      families: fonts.map((font: FontType) => font.family),
+      text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    },
+  })
+}
+
+export const loadFontsWithSubsets = (fonts: FontType[], category: string, subset: string) => {
+  let fontsList: string[] = []
+
+  fonts.forEach(font => {
     const hasRegular = font.variants.indexOf('regular') !== -1
     let subsets = ''
 
@@ -92,23 +78,18 @@ export const filterFonts = (
     }
 
     if (hasRegular) {
-      fonts.push(font.family + subsets)
+      fontsList.push(font.family + subsets)
     } else {
-      fonts.push(font.family + ':' + font.variants[0] + subsets)
+      fontsList.push(font.family + ':' + font.variants[0] + subsets)
     }
   })
 
-  if (fonts.length > 0) {
-    const pages = Math.ceil(fonts.length / SEARCH_PAGE_SIZE)
-    Array.from(Array(pages).keys()).forEach(page => {
-      WebFont.load({
-        classes: false,
-        google: {
-          families: fonts.slice(page * SEARCH_PAGE_SIZE, (page + 1) * SEARCH_PAGE_SIZE)
-        },
-      })
+  if (fontsList.length > 0) {
+    WebFont.load({
+      classes: false,
+      google: {
+        families: fontsList,
+      },
     })
   }
-
-  return data
 }
