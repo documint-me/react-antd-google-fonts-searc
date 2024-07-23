@@ -3,7 +3,7 @@ import { weightLabels } from './constants'
 
 export const getLinkFormats = (font: FontType) => {
   const family = font.family.replace(/ /g, '+')
-  let url = 'https://fonts.googleapis.com/css?family=' + family
+  let url = 'https://fonts.googleapis.com/css2?family=' + family
   let category = font.category
 
   if (category === 'display' || category === 'handwriting') {
