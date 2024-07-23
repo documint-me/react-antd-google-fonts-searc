@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useContext, useMemo } from 'react';
-import { Col, Card, Skeleton, Typography, Row, Input, Select, Segmented, Button, Slider, Modal, message, Checkbox, Space, BackTop, Drawer, Divider } from 'antd';
+import { Col, Card, Skeleton, Typography, Row, Pagination, Input, Select, Segmented, Button, Slider, Modal, message, Checkbox, Space, Drawer, Divider } from 'antd';
 import { AppstoreOutlined, BarsOutlined, ReloadOutlined, CloseOutlined, FilterOutlined, SettingOutlined } from '@ant-design/icons';
 
 /******************************************************************************
@@ -128,16 +128,13 @@ var webfontloader = {exports: {}};
 
 var WebFont = webfontloader.exports;
 
-var PAGE_SIZE = 1000;
-var SEARCH_PAGE_SIZE = 500;
-var loadFontData = function (sort, ignoreWebfontsLoad) { return __awaiter(void 0, void 0, void 0, function () {
-    var url, key, res, resJson_1, pages, error_1;
+var loadFontData = function (sort, _ignoreWebfontsLoad) { return __awaiter(void 0, void 0, void 0, function () {
+    var url, key, res, resJson, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 url = 'https://www.googleapis.com/webfonts/v1/webfonts?';
-                key = 'AIzaSyD_nw41oN07OX5vrjt_uD_UEm_QVD-OZ4k' // process.env.REACT_APP_GOOGLE_API_KEY
-                ;
+                key = process.env.REACT_APP_GOOGLE_API_KEY;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 4, , 5]);
@@ -146,18 +143,8 @@ var loadFontData = function (sort, ignoreWebfontsLoad) { return __awaiter(void 0
                 res = _a.sent();
                 return [4 /*yield*/, res.json()];
             case 3:
-                resJson_1 = _a.sent();
-                pages = Math.ceil(resJson_1.items.length / PAGE_SIZE);
-                !ignoreWebfontsLoad && Array.from(Array(pages).keys()).forEach(function (page) {
-                    WebFont.load({
-                        classes: false,
-                        google: {
-                            families: __spreadArray([], resJson_1.items, true).slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map(function (font) { return font.family; }),
-                            text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-                        },
-                    });
-                });
-                return [2 /*return*/, resJson_1.items];
+                resJson = _a.sent();
+                return [2 /*return*/, resJson.items];
             case 4:
                 error_1 = _a.sent();
                 console.error(url, error_1.toString());
@@ -180,9 +167,7 @@ var checkCategory = function (font, category, subset) {
 };
 var filterFonts = function (allFonts, sort, category, subset, search) {
     search = search.toLowerCase().trim();
-    var fonts = [];
-    var data = allFonts[sort];
-    data = data.filter(function (elem) {
+    return allFonts[sort].filter(function (elem) {
         var isCategory = true, isMatch = true;
         isCategory = Boolean(checkCategory(elem, category, subset));
         if (search.length > 0) {
@@ -190,7 +175,19 @@ var filterFonts = function (allFonts, sort, category, subset, search) {
         }
         return isCategory && isMatch;
     });
-    data.forEach(function (font) {
+};
+var loadFonts = function (fonts) {
+    WebFont.load({
+        classes: false,
+        google: {
+            families: fonts.map(function (font) { return font.family; }),
+            text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        },
+    });
+};
+var loadFontsWithSubsets = function (fonts, category, subset) {
+    var fontsList = [];
+    fonts.forEach(function (font) {
         var hasRegular = font.variants.indexOf('regular') !== -1;
         var subsets = '';
         if (subset !== 'latin') {
@@ -202,24 +199,20 @@ var filterFonts = function (allFonts, sort, category, subset, search) {
             }
         }
         if (hasRegular) {
-            fonts.push(font.family + subsets);
+            fontsList.push(font.family + subsets);
         }
         else {
-            fonts.push(font.family + ':' + font.variants[0] + subsets);
+            fontsList.push(font.family + ':' + font.variants[0] + subsets);
         }
     });
-    if (fonts.length > 0) {
-        var pages = Math.ceil(fonts.length / SEARCH_PAGE_SIZE);
-        Array.from(Array(pages).keys()).forEach(function (page) {
-            WebFont.load({
-                classes: false,
-                google: {
-                    families: fonts.slice(page * SEARCH_PAGE_SIZE, (page + 1) * SEARCH_PAGE_SIZE)
-                },
-            });
+    if (fontsList.length > 0) {
+        WebFont.load({
+            classes: false,
+            google: {
+                families: fontsList,
+            },
         });
     }
-    return data;
 };
 
 var SearchContext = React.createContext({
@@ -341,6 +334,7 @@ var FontSkeleton = function () {
 };
 
 var Text$5 = Typography.Text;
+var PAGE_SIZE = 16;
 var Font$1 = function (_a) {
     var font = _a.font;
     var _b = useSearchContext(), view = _b.view, text = _b.text, previewSize = _b.previewSize, setFont = _b.setFont, setEditFontOpen = _b.setEditFontOpen, setCurrentFontLoading = _b.setCurrentFontLoading;
@@ -380,11 +374,26 @@ var Font$1 = function (_a) {
                             React.createElement("span", null, text === 'fontName' ? font.family : text))))))));
 };
 var Fonts = function () {
-    var _a = useSearchContext(), loading = _a.loading, fonts = _a.fonts;
+    var _a = useSearchContext(), loading = _a.loading, fonts = _a.fonts, search = _a.search, category = _a.category, subset = _a.subset, sort = _a.sort;
+    var _b = useState(1), page = _b[0], setPage = _b[1];
+    var currentFonts = useMemo(function () { return __spreadArray([], fonts, true).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE); }, [fonts, page]);
+    useEffect(function () {
+        loadFonts(currentFonts);
+        loadFontsWithSubsets(currentFonts, category, subset);
+    }, [page]);
+    useEffect(function () {
+        setPage(1);
+    }, [search, category, subset, sort]);
     return (React.createElement(React.Fragment, null,
-        loading && [1, 2, 3, 4, 5, 6, 7, 8].map(function (val) { return React.createElement(FontSkeleton, { key: val }); }),
-        !loading && (React.createElement(React.Fragment, null, fonts.length ? (fonts.map(function (font, i) { return React.createElement(Font$1, { key: i, font: font }); })) : (React.createElement(Col, { span: 24, style: { textAlign: 'center' } },
-            React.createElement(Text$5, { strong: true }, "No fonts found")))))));
+        loading && (React.createElement(Row, { gutter: [16, 16], className: "fonts-body" }, [1, 2, 3, 4, 5, 6, 7, 8].map(function (val) { return (React.createElement(FontSkeleton, { key: val })); }))),
+        !loading && (React.createElement(React.Fragment, null, fonts.length ? (React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "flex-center" },
+                React.createElement(Pagination, { simple: true, current: page, total: fonts.length, defaultPageSize: PAGE_SIZE, onChange: setPage })),
+            React.createElement(Row, { gutter: [16, 16], className: "fonts-body" }, currentFonts.map(function (font, i) { return (React.createElement(Font$1, { key: i, font: font })); })),
+            React.createElement("div", { className: "flex-center" },
+                React.createElement(Pagination, { simple: true, current: page, onChange: setPage, defaultPageSize: PAGE_SIZE, total: fonts.length })))) : (React.createElement(Row, { gutter: [16, 16], className: "fonts-body" },
+            React.createElement(Col, { span: 24, style: { textAlign: 'center' } },
+                React.createElement(Text$5, { strong: true }, "No fonts found"))))))));
 };
 
 var Search = Input.Search;
@@ -489,7 +498,7 @@ var ResultsCount = function () {
 
 var getLinkFormats = function (font) {
     var family = font.family.replace(/ /g, '+');
-    var url = 'https://fonts.googleapis.com/css?family=' + family;
+    var url = 'https://fonts.googleapis.com/css2?family=' + family;
     var category = font.category;
     if (category === 'display' || category === 'handwriting') {
         category = 'cursive';
@@ -729,7 +738,6 @@ var SearchLayout = function (_a) {
     return (React.createElement(SearchProvider, { addedFonts: addedFonts },
         React.createElement(EditFont, { onChange: onChange }),
         React.createElement(Space, { direction: "vertical", size: "middle", style: { display: 'flex' } },
-            React.createElement(BackTop, null),
             React.createElement(Drawer, { title: React.createElement(ResetAllButton, null), placement: "right", onClose: function () { return setOpenFilters(false); }, open: openFilters },
                 React.createElement(Divider, { orientation: "left" }, "Preview"),
                 React.createElement(Preview, null),
@@ -751,8 +759,7 @@ var SearchLayout = function (_a) {
                     React.createElement(ResultsCount, null)),
                 React.createElement(Col, { span: 12, className: "flex-end" },
                     React.createElement(ToggleView, null))),
-            React.createElement(Row, { gutter: [16, 16], className: 'fonts-body' },
-                React.createElement(Fonts, null)))));
+            React.createElement(Fonts, null))));
 };
 
 var plugin = function (editor, opts) {
@@ -823,7 +830,7 @@ var plugin = function (editor, opts) {
                                 if (!((_a = this.googleFonts) !== null && _a !== void 0)) return [3 /*break*/, 1];
                                 _b = _a;
                                 return [3 /*break*/, 3];
-                            case 1: return [4 /*yield*/, loadFontData('popularity', true)];
+                            case 1: return [4 /*yield*/, loadFontData('popularity')];
                             case 2:
                                 _b = (_c.sent());
                                 _c.label = 3;
