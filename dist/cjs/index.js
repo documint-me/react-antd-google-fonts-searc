@@ -386,9 +386,11 @@ var Fonts = function () {
     var _b = React.useState(1), page = _b[0], setPage = _b[1];
     var currentFonts = React.useMemo(function () { return __spreadArray([], fonts, true).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE); }, [fonts, page]);
     React.useEffect(function () {
-        loadFonts(currentFonts);
-        loadFontsWithSubsets(currentFonts, category, subset);
-    }, [page]);
+        if (currentFonts.length) {
+            loadFonts(currentFonts);
+            loadFontsWithSubsets(currentFonts, category, subset);
+        }
+    }, [currentFonts]);
     React.useEffect(function () {
         setPage(1);
     }, [search, category, subset, sort]);
