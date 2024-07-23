@@ -1,6 +1,6 @@
-import { Card, Col, Row, Typography } from 'antd'
+import { Card, Col, Row, Typography, Pagination } from 'antd'
 import { useSearchContext } from 'context/search-context'
-import React, { FC } from 'react'
+import React, { FC, useCallback, useMemo, useState } from 'react'
 import { FontType } from 'types/index'
 import FontSkeleton from '../font-skeleton'
 import WebFont from 'webfontloader'
@@ -10,6 +10,8 @@ const { Text } = Typography
 interface IFont {
   font: FontType
 }
+
+const PAGE_SIZE = 16
 
 const Font: FC<IFont> = ({ font }) => {
   const { view, text, previewSize, setFont, setEditFontOpen, setCurrentFontLoading } = useSearchContext()
@@ -66,17 +68,39 @@ const Font: FC<IFont> = ({ font }) => {
 
 const Fonts = () => {
   const { loading, fonts } = useSearchContext()
+  const [page, setPage] = useState(1)
+
   return (
     <>
-      {loading && [1, 2, 3, 4, 5, 6, 7, 8].map(val => <FontSkeleton key={val} />)}
+      {loading && (
+        <Row gutter={[16, 16]} className="fonts-body">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(val => (
+            <FontSkeleton key={val} />
+          ))}
+        </Row>
+      )}
       {!loading && (
         <>
           {fonts.length ? (
-            fonts.map((font, i) => <Font key={i} font={font} />)
+            <>
+              <div className="flex-center">
+                <Pagination simple current={page} total={fonts.length} defaultPageSize={PAGE_SIZE} onChange={setPage} />
+              </div>
+              <Row gutter={[16, 16]} className="fonts-body">
+                {[...fonts].slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((font, i) => (
+                  <Font key={i} font={font} />
+                ))}
+              </Row>
+              <div className="flex-center">
+                <Pagination simple current={page} onChange={setPage} defaultPageSize={PAGE_SIZE} total={fonts.length} />
+              </div>
+            </>
           ) : (
-            <Col span={24} style={{ textAlign: 'center' }}>
-              <Text strong>No fonts found</Text>
-            </Col>
+            <Row gutter={[16, 16]} className="fonts-body">
+              <Col span={24} style={{ textAlign: 'center' }}>
+                <Text strong>No fonts found</Text>
+              </Col>
+            </Row>
           )}
         </>
       )}

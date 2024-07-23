@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react'
-import { Col, Row, Divider, Button, Drawer, Space, BackTop } from 'antd'
+import { Col, Row, Divider, Button, Drawer, Space } from 'antd'
 import { FilterOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons'
 import Fonts from 'ui/components/font'
 import SearchInput from 'ui/components/search-input'
@@ -15,7 +15,7 @@ import AddedFonts from 'ui/components/manage-fonts/added-fonts'
 import { SearchLayoutProps } from './types'
 import './style.css'
 
-const SearchLayout:FC<SearchLayoutProps> = ({ addedFonts, onChange }) => {
+const SearchLayout: FC<SearchLayoutProps> = ({ addedFonts, onChange }) => {
   const [openFilters, setOpenFilters] = useState(false)
   const [openSettings, setOpenSettings] = useState(false)
 
@@ -23,7 +23,6 @@ const SearchLayout:FC<SearchLayoutProps> = ({ addedFonts, onChange }) => {
     <SearchProvider addedFonts={addedFonts}>
       <EditFont onChange={onChange} />
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        <BackTop />
         <Drawer title={<ResetAllButton />} placement="right" onClose={() => setOpenFilters(false)} open={openFilters}>
           <Divider orientation="left">Preview</Divider>
           <Preview />
@@ -70,9 +69,8 @@ const SearchLayout:FC<SearchLayoutProps> = ({ addedFonts, onChange }) => {
             <ToggleView />
           </Col>
         </Row>
-        <Row gutter={[16, 16]} className='fonts-body'>
-          <Fonts />
-        </Row>
+
+        <Fonts />
       </Space>
     </SearchProvider>
   )
